@@ -23,3 +23,6 @@ class NEConfigOutput(BaseModel):
 
 class NEName(BaseModel):
     ne_name: Annotated[str, Field(min_length=3)]
+
+class NEID(BaseModel):
+    id: int
