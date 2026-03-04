@@ -2,11 +2,14 @@
 from fastapi import FastAPI, HTTPException
 
 from src.get_config_api.routers.config import config_router
+from src.get_config_api.routers.auth import auth_router
+from src.get_config_api.routers.get_me import get_me_router
 
 
 app = FastAPI()
+app.include_router(auth_router)
 app.include_router(config_router)
-
+app.include_router(get_me_router)
 
 
 # http -> get

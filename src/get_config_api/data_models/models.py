@@ -27,3 +27,7 @@ class NEName(BaseModel):
 
 class NEID(BaseModel):
     id: int
+
+
+class User(BaseModel):
+    username: str

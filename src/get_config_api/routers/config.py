@@ -1,6 +1,7 @@
 import json
 
 from fastapi import APIRouter, HTTPException
+from fastapi.params import Depends
 from pydantic import ValidationError
 
 from starlette import status
@@ -8,7 +9,8 @@ from starlette import status
 from src.get_config_api.settings import get_settings
 from src.get_config_api.get_data_from_file.file_handlers import JSONFileHandler
 
-from src.get_config_api.data_models.models import NEConfigOutput, NEConfigInput, NEID
+from src.get_config_api.data_models.models import NEConfigOutput, NEConfigInput, NEID, User
+from src.get_config_api.auth.auth import get_user_from_token
 
 
 settings = get_settings()
@@ -19,12 +21,12 @@ config_router = APIRouter()
 
 
 @config_router.get("/config", tags=["config"])
-def get_all_config():
+def get_all_config(_current_user: User = Depends(get_user_from_token)):
     return [NEConfigOutput(**ne) for ne in config_data]
 
 
 @config_router.get("/config/{ne_name}", tags=["config"])
-def get_ne_config(ne_name: str):
+def get_ne_config(ne_name: str, _current_user: User = Depends(get_user_from_token)):
     try:
         for ne in config_data:
             if ne["ne_name"] == ne_name:
@@ -36,7 +38,7 @@ def get_ne_config(ne_name: str):
 
 
 @config_router.get("/config-by-ip", tags=["config"])
-def get_ne_config_by_om_ip(ip: str):
+def get_ne_config_by_om_ip(ip: str, _current_user: User = Depends(get_user_from_token)):
 
     try:
         ne_data = [NEConfigOutput(**ne) for ne in config_data if ne["om_ip"] == ip]
@@ -48,7 +50,7 @@ def get_ne_config_by_om_ip(ip: str):
 
 
 @config_router.post("/config/{ne_name}", tags=["config"])
-def add_ne_config(network_element: NEConfigInput):
+def add_ne_config(network_element: NEConfigInput, _current_user: User = Depends(get_user_from_token)):
     ne_data = [ne for ne in config_data if ne["ne_name"] == network_element.ne_name]
     if ne_data:
         raise HTTPException(status_code=status.HTTP_409_CONFLICT, detail=f"Ne already exists")
@@ -65,7 +67,7 @@ def add_ne_config(network_element: NEConfigInput):
 
 
 @config_router.delete("/config/{id}", tags=["config"])
-def delete_ne_config(network_element: NEID):
+def delete_ne_config(network_element: NEID, _current_user: User = Depends(get_user_from_token)):
     ne_del = [ne for ne in config_data if ne["id"] == network_element.id]
     if not ne_del:
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail=f"Ne {network_element} does not exist")
