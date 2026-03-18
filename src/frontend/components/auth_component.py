@@ -11,7 +11,7 @@ def render_login_page() -> tuple[str, str, bool]:
 
     with st.form("login form"):
         username = st.text_input("Username", placeholder="Enter your username")
-        password = st.text_input("Password", placeholder="Enter your password")
+        password = st.text_input("Password", placeholder="Enter your password", type="password")
         submitted = st.form_submit_button("Login")
 
     return username.strip(), password, submitted

@@ -1,7 +1,7 @@
 """Session state initialization"""
 
 import streamlit as st
-from numpy import ufunc
+
 
 TOKEN_KEY = "access_token"
 USER_KEY = "auth_user"
