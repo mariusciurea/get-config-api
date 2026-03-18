@@ -3,14 +3,19 @@ import json
 from fastapi import APIRouter, HTTPException
 from fastapi.params import Depends
 from pydantic import ValidationError
+from requests import Session
 
 from starlette import status
+from sqlalchemy.orm import Session
 
 from src.get_config_api.settings import get_settings
 from src.get_config_api.get_data_from_file.file_handlers import JSONFileHandler
 
 from src.get_config_api.data_models.models import NEConfigOutput, NEConfigInput, NEID, User
 from src.get_config_api.auth.auth import get_user_from_token
+
+from src.get_config_api.databse.db_models import NetworkElementConfig
+from src.get_config_api.databse.db import get_db
 
 
 settings = get_settings()
@@ -21,9 +26,9 @@ config_router = APIRouter()
 
 
 @config_router.get("/config", tags=["config"])
-def get_all_config(_current_user: User = Depends(get_user_from_token)):
-    return [NEConfigOutput(**ne) for ne in config_data]
-
+def get_all_config(_current_user: User = Depends(get_user_from_token), db: Session = Depends(get_db)):
+    # return [NEConfigOutput(**ne) for ne in config_data]
+    return db.query(NetworkElementConfig).all()
 
 @config_router.get("/config/{ne_name}", tags=["config"])
 def get_ne_config(ne_name: str, _current_user: User = Depends(get_user_from_token)):

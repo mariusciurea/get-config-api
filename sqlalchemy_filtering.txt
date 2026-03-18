@@ -1,0 +1,74 @@
+class User(Base):
+    __tablename__ = "users"
+    id = Column(Integer, primary_key=True, index=True)
+    name = Column(String(100), unique=True, index=True)
+    age = Column(Integer)
+    country = Column(String(50))
+    hashed_password = Column(String(100))
+
+
+
+db.query(User).filter(User.name == "Marius")
+
+
+Operators:
+User.age == 25
+User.age != 25
+User.age > 18
+User.age < 65
+User.age >= 18
+User.age <= 65
+
+
+db.query(User).filter_by(name="Marius", age=25)
+# only = operator is supported in filter_by and implicit AND is used between the conditions
+
+
+from sqlalchemy import and_, or_, not_
+
+# and
+db.query(User).filter(and_(User.age > 18, User.name == "Marius"))
+
+# or
+db.query(User).filter(
+    or_(
+        User.name == "Marius",
+        User.name == "Ion"
+    )
+)
+
+# not
+db.query(User).filter(
+    not_(User.name == "Marius")
+)
+
+#in
+db.query(User).filter(User.id.in_([1, 2, 3]))
+
+# not in
+db.query(User).filter(~User.id.in_([1, 2, 3]))
+
+# like
+User.name.like("Mar%")  #starts with
+User.name.like("%ius")  # ends with
+User.name.like("%ari%") # contains
+
+# between
+User.age.between(18, 30)
+
+
+sql functions
+
+from sqlalchemy import func
+
+db.query(User).filter(func.length(User.name) > 5)
+db.query(User).filter(func.lower(User.name) == "marius")
+
+# aggregation + having
+db.query(User.country, func.count(User.id)) \
+  .group_by(User.country) \
+  .having(func.count(User.id) > 10)
+
+# join
+
+db.query(User).join(Post).filter(Post.title == "SQLAlchemy")

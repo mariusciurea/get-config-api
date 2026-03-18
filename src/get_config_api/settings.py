@@ -3,12 +3,16 @@ from ctypes import HRESULT
 from pydantic_settings import BaseSettings
 from pathlib import Path
 from argon2 import PasswordHasher
+from dotenv import load_dotenv
+
+
 
 
 ph = PasswordHasher()
 
 class Settings(BaseSettings):
     BASE_DIR: Path = Path(__file__).resolve().parent
+    PROJECT_DIR: Path = BASE_DIR.parent.parent
     DATA_DIR: Path = BASE_DIR / "data"
     USER: dict = {
         "admin": {
@@ -21,10 +25,27 @@ class Settings(BaseSettings):
     ACCESS_TOKEN_EXPIRE_MINUTES: int = 30
 
 
+class DBSettings(BaseSettings):
+    DB_USER: str = "root"
+    DB_PASSWORD: str = ""
+    DB_HOST: str = "localhost"
+    DB_PORT: int = 3306
+    DB_NAME:str = "devgetconfig"
+
+
 def get_settings() -> Settings:
     """Return settings object"""
 
     return Settings()
+
+
+def get_db_settings() -> DBSettings:
+    """Return db settings object"""
+
+    return DBSettings()
+
+
+load_dotenv(get_settings().PROJECT_DIR / ".env")
 
 
 if __name__ == "__main__":
